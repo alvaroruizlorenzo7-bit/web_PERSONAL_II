@@ -9,6 +9,22 @@ use Symfony\Component\Routing\Attribute\Route;
 final class BlogController extends AbstractController
 {
 
+ #[Route('/testimonial', name: 'testimonial')]
+    public function testimonial(): Response
+    {
+        return $this->render('blog/testimonial.html.twig');
+    }
+
+
+
+
+
+  #[Route('/guide', name: 'guide')]
+    public function guide(): Response
+    {
+        return $this->render('blog/guide.html.twig');
+    }
+
 
 
 
