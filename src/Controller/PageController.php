@@ -13,7 +13,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class PageController extends AbstractController
 {
-
+#[Route('/thankyou', name: 'thankyou')]
+public function thankyou(): Response
+{
+    return $this->render('page/thankyou.html.twig');
+}
 
     #[Route('/package', name: 'package')]
     public function package(): Response
@@ -34,26 +38,25 @@ final class PageController extends AbstractController
 
 
       #[Route('/contact', name: 'contact')]
-    public function contact(ManagerRegistry $doctrine, Request $request): Response
-    {
-        $contact = new Contact();
-        $form = $this->createForm(ContactFormType::class, $contact);
+public function contact(ManagerRegistry $doctrine, Request $request): Response
+{
+    $contact = new Contact();
+    $form = $this->createForm(ContactFormType::class, $contact);
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        $entityManager = $doctrine->getManager();
+        $entityManager->persist($contact);
+        $entityManager->flush();
+
         
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $doctrine->getManager();
-            $entityManager->persist($contact);
-            $entityManager->flush();
-
-            $this->addFlash('success', '¡Mensaje enviado!');
-            return $this->redirectToRoute('index');
-        }
-
-        return $this->render('page/contact.html.twig', [
-            'form' => $form->createView(),
-        ]);
+        return $this->redirectToRoute('thankyou');
     }
+
+    return $this->render('page/contact.html.twig', [
+        'form' => $form->createView(),
+    ]);
+}
 
 #[Route('/about', name: 'about')]
 public function about(): Response

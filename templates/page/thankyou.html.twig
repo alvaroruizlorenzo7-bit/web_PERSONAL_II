@@ -1,0 +1,20 @@
+{# templates/page/thankyou.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}¡Gracias por contactar!{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="p-5 mb-4 bg-light rounded-3 shadow-sm">
+        <div class="container-fluid py-5 text-center">
+            <h1 class="display-5 fw-bold text-primary">¡Mensaje Recibido!</h1>
+            <p class="col-md-8 fs-4 mx-auto">
+                Gracias por ponerte en contacto con nosotros. Hemos recibido tu mensaje correctamente y nuestro equipo te responderá lo antes posible.
+            </p>
+            <hr class="my-4">
+            <p>Mientras tanto, puedes seguir explorando nuestro sitio web.</p>
+            <a class="btn btn-primary btn-lg" href="{{ path('index') }}" role="button">Volver al Inicio</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
