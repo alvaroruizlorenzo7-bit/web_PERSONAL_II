@@ -6,7 +6,9 @@ use App\Entity\Contact;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class ContactFormType extends AbstractType
 {
@@ -15,11 +17,10 @@ class ContactFormType extends AbstractType
         $builder
             ->add('firstName')
             ->add('lastName')
-            ->add('email')
+            ->add('email', EmailType::class)
             ->add('subject')
-            ->add('message')
-           
-            ->add('Send', SubmitType::class, ['label' => 'Send']); 
+            ->add('message', TextareaType::class)
+            ->add('Send', SubmitType::class, ['label' => 'Enviar']);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

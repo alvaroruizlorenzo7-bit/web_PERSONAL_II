@@ -2,7 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Contact;
 use App\Form\ContactFormType;
+use Doctrine\Persistence\ManagerRegistry;
+
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,18 +33,27 @@ final class PageController extends AbstractController
 
 
 
-        #[Route('/contact', name: 'contact')]
-    public function contact(): Response
+      #[Route('/contact', name: 'contact')]
+    public function contact(ManagerRegistry $doctrine, Request $request): Response
     {
-       // 2. Crea la instancia del formulario
-        $form = $this->createForm(ContactFormType::class);
+        $contact = new Contact();
+        $form = $this->createForm(ContactFormType::class, $contact);
+        
+        $form->handleRequest($request);
 
-        // 3. Pasa el formulario a la vista
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager = $doctrine->getManager();
+            $entityManager->persist($contact);
+            $entityManager->flush();
+
+            $this->addFlash('success', '¡Mensaje enviado!');
+            return $this->redirectToRoute('index');
+        }
+
         return $this->render('page/contact.html.twig', [
             'form' => $form->createView(),
         ]);
     }
-
 
 #[Route('/about', name: 'about')]
 public function about(): Response
