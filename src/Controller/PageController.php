@@ -63,9 +63,10 @@ public function about(): Response
 {
     return $this->render('page/about.html.twig', []);
 }
-    #[Route('', name: 'index')]
+    #[Route('/', name: 'index')]
     public function index(): Response
     {
+        $this->denyAccessUnlessGranted("ROLE_USER");
         return $this->render('page/index.html.twig', [
             'controller_name' => 'PageController',
         ]);
