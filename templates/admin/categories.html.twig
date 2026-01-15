@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Categories{% endblock %}
+
+{% block body %}
+<div id="categories">
+    <div class="container">
+        <div class="col-xs-12 col-sm-8 col-sm-push-2">
+            <h1>Categories</h1>
+            
+            {{ form(form, {'attr': {'class': 'form-horizontal'}}) }}
+            
+            <hr class='divider'>
+            {# --- TABLA PARA MOSTRAR LA LISTA --- #}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cat in categories %}
+                        <tr>
+                            <td>{{ cat.id }}</td>
+                            <td>{{ cat.name }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="2">No hay categorías registradas.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+        
+{% endblock %}
