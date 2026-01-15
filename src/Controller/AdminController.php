@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Image;
 use App\Entity\Category;
+use App\Form\ImageFormType;
 use App\Form\CategoryFormType;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,6 +14,24 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class AdminController extends AbstractController
 {
+
+    #[Route('/admin/images', name: 'app_images')]
+public function images(ManagerRegistry $doctrine, Request $request): Response
+{
+    $image = new Image();
+    $form = $this->createForm(ImageFormType::class, $image);
+    $form->handleRequest($request);
+    if ($form->isSubmitted() && $form->isValid()) {
+        $image = $form->getData();    
+        $entityManager = $doctrine->getManager();    
+        $entityManager->persist($image);
+        $entityManager->flush();
+    }
+    return $this->render('admin/images.html.twig', array(
+        'form' => $form->createView()
+    ));
+}
+
 
 
         #[Route('/admin/categories', name: 'app_categories')]
@@ -41,9 +61,4 @@ public function categories(ManagerRegistry $doctrine, Request $request): Respons
 
 
 
-    #[Route('/admin/images', name: 'app_images')]
-    public function images(): Response
-    {
-        return $this->render('admin/images.html.twig', []);
-    }
 }
