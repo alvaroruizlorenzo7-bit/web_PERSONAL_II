@@ -15,58 +15,64 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 final class BlogController extends AbstractController
 {
 
-
-
-
-   #[Route('/blog/new', name: 'new_post')]
-public function newPost(ManagerRegistry $doctrine, Request $request, SluggerInterface $slugger): Response
+#[Route('/single_post/{slug}', name: 'single_post')]
+public function post(ManagerRegistry $doctrine, $slug): Response
 {
-    // 1. Comprobar sesión
-    $this->denyAccessUnlessGranted('ROLE_USER');
-
-    $post = new Post();
-    $form = $this->createForm(PostFormType::class, $post);
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        /** @var UploadedFile $imageFile */
-        $imageFile = $form->get('image')->getData();
-
-        if ($imageFile) {
-            // Creamos un nombre único para el archivo
-            $newFilename = uniqid().'.'.$imageFile->guessExtension();
-
-            // Movemos el archivo a la carpeta configurada
-            try {
-                $imageFile->move(
-                    $this->getParameter('images_directory'),
-                    $newFilename
-                );
-                // 2. INFORMAMOS EL CAMPO IMAGE CON EL NOMBRE DEL ARCHIVO
-                $post->setImage($newFilename); 
-            } catch (FileException $e) {
-                // ... manejar error si falla la subida
-            }
-        }
-
-        $post->setSlug($slugger->slug($post->getTitle()));
-        $post->setPostUser($this->getUser());
-        $post->setNumLikes(0);
-        $post->setNumComments(0);
-
-        $em = $doctrine->getManager();
-        $em->persist($post);
-        $em->flush(); // Ya no dará error porque 'image' ya tiene valor
-
-        return $this->redirectToRoute('new_post'); // O a la lista de posts
-    }
-
-    return $this->render('blog/new_post.html.twig', [
-        'form' => $form->createView(),
+    $repositorio = $doctrine->getRepository(Post::class);
+    $post = $repositorio->findOneBy(["slug"=>$slug]);
+    return $this->render('blog/single_post.html.twig', [
+        'post' => $post,
     ]);
 }
 
 
+ #[Route('/blog/new', name: 'new_post')]
+    public function newPost(ManagerRegistry $doctrine, Request $request, SluggerInterface $slugger): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+
+        $post = new Post();
+        $form = $this->createForm(PostFormType::class, $post);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $imageFile = $form->get('image')->getData();
+
+            if ($imageFile) {
+                $newFilename = uniqid().'.'.$imageFile->guessExtension();
+                try {
+                    $imageFile->move(
+                        $this->getParameter('images_directory'),
+                        $newFilename
+                    );
+                    $post->setImage($newFilename); 
+                } catch (FileException $e) {
+                    // Manejar error
+                }
+                // ¡BORRA EL RETURN DE AQUÍ!
+            }
+
+            // 1. GENERAMOS EL SLUG (Esto es lo que faltaba para la ruta)
+            $post->setSlug($slugger->slug($post->getTitle()));
+            
+            // 2. OTROS DATOS
+            $post->setPostUser($this->getUser());
+            $post->setNumLikes(0);
+            $post->setNumComments(0);
+
+            // 3. GUARDAMOS EN BASE DE DATOS
+            $entityManager = $doctrine->getManager();    
+            $entityManager->persist($post);
+            $entityManager->flush();
+
+            // 4. AHORA SÍ REDIRIGIMOS (Fuera del if de la imagen)
+            return $this->redirectToRoute('single_post', ["slug" => $post->getSlug()]);
+        }
+
+        return $this->render('blog/new_post.html.twig', [
+            'form' => $form->createView()    
+        ]);
+    }
 
 
 

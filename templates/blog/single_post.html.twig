@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ post ? post.title : 'Post no encontrado' }}{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    {% if not post %}
+        <div class="alert alert-warning text-center">
+            <h2>Post not found</h2>
+            <p>Lo sentimos, la entrada de blog que buscas no existe.</p>
+            <a href="{{ path('index') }}" class="btn btn-primary">Volver al inicio</a>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h1 class="mb-3">{{ post.title }}</h1>
+                
+                <p class="text-muted">
+                    Publicado por <strong>{{ post.postUser.name }}</strong> 
+                    el {{ post.publishedAt | date('d') }} de {{ post.publishedAt | date('F') }}
+                </p>
+
+                <hr>
+
+                {# Renderizamos la imagen del post #}
+                <img src="{{ asset('uploads/images/' ~ post.image) }}" class="img-fluid rounded mb-4" alt="{{ post.title }}">
+
+                <div class="blog-content" style="white-space: pre-wrap;">
+                    {{ post.content }}
+                </div>
+
+                <hr class="my-5">
+                
+                <div class="stats mb-5">
+                    <span class="badge badge-primary p-2">❤️ {{ post.numLikes }} Likes</span>
+                    <span class="badge badge-secondary p-2">💬 {{ post.numComments }} Comentarios</span>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
