@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 final class BlogController extends AbstractController
 {
@@ -17,34 +18,53 @@ final class BlogController extends AbstractController
 
 
 
-    #[Route('/blog/new', name: 'new_post')]
-    public function newPost(ManagerRegistry $doctrine, Request $request, SluggerInterface $slugger): Response
-    {
-        $post = new Post();
-        $form = $this->createForm(PostFormType::class, $post);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $post = $form->getData();   
-            
-            // Quitamos los caracteres especiales del título para crear el slug
-            $post->setSlug($slugger->slug($post->getTitle()));
-            
-            // Guardamos el usuario que crea el post y los contadores a 0
-            $post->setPostUser($this->getUser());
-            $post->setNumLikes(0);
-            $post->setNumComments(0);
+   #[Route('/blog/new', name: 'new_post')]
+public function newPost(ManagerRegistry $doctrine, Request $request, SluggerInterface $slugger): Response
+{
+    // 1. Comprobar sesión
+    $this->denyAccessUnlessGranted('ROLE_USER');
 
-            $entityManager = $doctrine->getManager();    
-            $entityManager->persist($post);
-            $entityManager->flush();
-            return $this->render('blog/new_post.html.twig', array(
-                'form' => $form->createView()    
-            ));
+    $post = new Post();
+    $form = $this->createForm(PostFormType::class, $post);
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        /** @var UploadedFile $imageFile */
+        $imageFile = $form->get('image')->getData();
+
+        if ($imageFile) {
+            // Creamos un nombre único para el archivo
+            $newFilename = uniqid().'.'.$imageFile->guessExtension();
+
+            // Movemos el archivo a la carpeta configurada
+            try {
+                $imageFile->move(
+                    $this->getParameter('images_directory'),
+                    $newFilename
+                );
+                // 2. INFORMAMOS EL CAMPO IMAGE CON EL NOMBRE DEL ARCHIVO
+                $post->setImage($newFilename); 
+            } catch (FileException $e) {
+                // ... manejar error si falla la subida
+            }
         }
-        return $this->render('blog/new_post.html.twig', array(
-            'form' => $form->createView()    
-        ));
+
+        $post->setSlug($slugger->slug($post->getTitle()));
+        $post->setPostUser($this->getUser());
+        $post->setNumLikes(0);
+        $post->setNumComments(0);
+
+        $em = $doctrine->getManager();
+        $em->persist($post);
+        $em->flush(); // Ya no dará error porque 'image' ya tiene valor
+
+        return $this->redirectToRoute('new_post'); // O a la lista de posts
     }
+
+    return $this->render('blog/new_post.html.twig', [
+        'form' => $form->createView(),
+    ]);
+}
 
 
 
