@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\Contact;
 use App\Form\ContactFormType;
 use Doctrine\Persistence\ManagerRegistry;
-
+use App\Entity\Category;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -13,6 +13,23 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class PageController extends AbstractController
 {
+
+    // ... otros imports
+
+
+#[Route('/', name: 'index')]
+public function index(ManagerRegistry $doctrine, Request $request): Response
+{
+    // Obtenemos el repositorio de la entidad Category
+    $repository = $doctrine->getRepository(Category::class);
+
+    // Recuperamos todas las categorías de la base de datos
+    $categories = $repository->findAll();
+
+    return $this->render('page/index.html.twig', [
+        'categories' => $categories
+    ]);
+}
 #[Route('/thankyou', name: 'thankyou')]
 public function thankyou(): Response
 {
@@ -63,12 +80,5 @@ public function about(): Response
 {
     return $this->render('page/about.html.twig', []);
 }
-    #[Route('/', name: 'index')]
-    public function index(): Response
-    {
-        $this->denyAccessUnlessGranted("ROLE_USER");
-        return $this->render('page/index.html.twig', [
-            'controller_name' => 'PageController',
-        ]);
-    }
+    
 }
