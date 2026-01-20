@@ -9,21 +9,44 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+// --- IMPORTANTE: AÑADE ESTAS DOS LÍNEAS ---
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Validator\Constraints\File;
 
 class ImageFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-           ->add('file')
-        ->add('numLikes', null, ['attr' => ['class'=>'form-control']])
-        ->add('numViews', null, ['attr' => ['class'=>'form-control']])
-        ->add('numDownloads', null, ['attr' => ['class'=>'form-control']])
-        ->add('category', EntityType::class, array(
-            'class' => Category::class,
-            'choice_label' => 'name'))
-        ->add('Send', SubmitType::class, ['attr' => ['class'=>'pull-right btn btn-lg sr-button']]);
-    ;
+            
+            ->add('file', FileType::class, [
+                'label' => 'Imagen (JPG o PNG)',
+                'mapped' => false, 
+                'required' => true,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '1024k',
+                        'mimeTypes' => [
+                            'image/jpeg',
+                            'image/png',
+                        ],
+                        'mimeTypesMessage' => 'Please upload a valid image file',
+                    ])
+                ],
+                'attr' => ['class' => 'form-control']
+            ])
+            
+            ->add('numLikes', null, ['attr' => ['class'=>'form-control']])
+            ->add('numViews', null, ['attr' => ['class'=>'form-control']])
+            ->add('numDownloads', null, ['attr' => ['class'=>'form-control']])
+            ->add('category', EntityType::class, [
+                'class' => Category::class,
+                'choice_label' => 'name',
+                'attr' => ['class' => 'form-control']
+            ])
+            ->add('Send', SubmitType::class, [
+                'attr' => ['class'=>'pull-right btn btn-lg sr-button']
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
