@@ -1,18 +1,47 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Images{% endblock %}
-
 {% block body %}
 <div id="images">
-      <div class="container">
+    <div class="container">
         <div class="col-xs-12 col-sm-8 col-sm-push-2">
-           <h1>Images</h1>
-           
-           {# ESTA ES LA LÍNEA QUE TE FALTA #}
-           {{ form(form) }}
+            <h1>Images</h1>
+            {{ form(form) }}
+            <hr class="divider">
 
-           <hr class="divider">
-        </div>   
-      </div>
-   </div>
+            {# --- TABLA DEL RETO --- #}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>File</th>
+                        <th>Views</th>
+                        <th>Likes</th>
+                        <th>Downloads</th>
+                        <th>Category</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for img in images %}
+                        <tr>
+                            <td>{{ img.id }}</td>
+                            <td>
+                                {# Usamos la ruta del reto para mostrar la miniatura #}
+                                <img src="{{ asset('uploads/images/' ~ img.file) }}" 
+                                     alt="image" style="width: 100px;">
+                            </td>
+                            <td>{{ img.numViews }}</td>
+                            <td>{{ img.numLikes }}</td>
+                            <td>{{ img.numDownloads }}</td>
+                            <td>{{ img.category ? img.category.name : 'Sin categoría' }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6">No images found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}

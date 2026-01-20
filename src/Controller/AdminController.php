@@ -18,54 +18,55 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 class AdminController extends AbstractController
 {
 
-     #[Route('/admin/images', name: 'app_images')]
-    public function images(ManagerRegistry $doctrine, Request $request, SluggerInterface $slugger): Response
-    {
-        $image = new Image();
-        $form = $this->createForm(ImageFormType::class, $image);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $file = $form->get('file')->getData();
-            if ($file) {
-                $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-                // El Slugger hace que el nombre del archivo sea seguro en cuanto a 
-                // caracteres especiales como espacios o acentos
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
+  #[Route('/admin/images', name: 'app_images')]
+public function images(ManagerRegistry $doctrine, Request $request, SluggerInterface $slugger): Response
+{
+    $image = new Image();
+    $form = $this->createForm(ImageFormType::class, $image);
+    $form->handleRequest($request);
 
-                // El servidor almacena el archivo en un directorio temporal y
-                // debemos moverlo a su ubicación definitiva, dentro de una ruta que
-                // hemos definido en los parámetros de configuración (services.yaml)
-                // y que debe existir previamente dentro de la carpeta `public` proyecto
-                try {
+    if ($form->isSubmitted() && $form->isValid()) {
+        $file = $form->get('file')->getData();
+        if ($file) {
+            $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeFilename = $slugger->slug($originalFilename);
+            $newFilename = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
 
-                    // Primero lo movemos al directorio de imágenes
-                    $file->move(
-                        $this->getParameter('images_directory'), $newFilename
-                    );
-                    $filesystem = new Filesystem();
-                    // Y ahora lo duplicamos en el directorio de portfolio
-                    $filesystem->copy(
-                        $this->getParameter('images_directory') . '/'. $newFilename, 
-                        $this->getParameter('portfolio_directory') . '/'.  $newFilename, true);
+            try {
+                // 1. Mover al directorio de imágenes
+                $file->move($this->getParameter('images_directory'), $newFilename);
+                
+                // 2. Duplicar en portfolio
+                $filesystem = new \Symfony\Component\Filesystem\Filesystem();
+                $filesystem->copy(
+                    $this->getParameter('images_directory') . '/'. $newFilename, 
+                    $this->getParameter('portfolio_directory') . '/'.  $newFilename, 
+                    true
+                );
 
-                } catch (FileException $e) {
-                    return new Response("Error al subir el archivo: " . $e->getMessage());
-                }
-
-                // asignamos el nombre del archivo, que se llama `file`, a la entidad Image
                 $image->setFile($newFilename);
+            } catch (FileException $e) {
+                // Manejar error si es necesario
             }
-            $image = $form->getData();   
-            $entityManager = $doctrine->getManager();    
-            $entityManager->persist($image);
-            $entityManager->flush();
         }
-        return $this->render('admin/images.html.twig', array(
-                        'form' => $form->createView()
-                    ));
+
+        $entityManager = $doctrine->getManager();    
+        $entityManager->persist($image);
+        $entityManager->flush();
+
+        // Redirigimos para limpiar el formulario tras guardar
+        return $this->redirectToRoute('app_images');
     }
 
+    // Buscamos las imágenes DESPUÉS del if para que siempre se ejecute
+    $images = $doctrine->getRepository(Image::class)->findAll();
+
+    // UN SOLO RETURN con todas las variables necesarias
+    return $this->render('admin/images.html.twig', [
+        'form' => $form->createView(),
+        'images' => $images
+    ]);
+}
 
 
         #[Route('/admin/categories', name: 'app_categories')]
