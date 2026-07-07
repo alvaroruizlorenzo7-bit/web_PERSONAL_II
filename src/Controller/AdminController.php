@@ -67,33 +67,25 @@ public function images(ManagerRegistry $doctrine, Request $request, SluggerInter
         'images' => $images
     ]);
 }
+    #[Route('/admin/categories', name: 'app_categories')]
+    public function categories(ManagerRegistry $doctrine, Request $request): Response
+    {
+        $category = new Category();
+        $form = $this->createForm(CategoryFormType::class, $category);
+        $form->handleRequest($request);
 
+        if ($form->isSubmitted() && $form->isValid()) {
+            $category = $form->getData();    
+            $entityManager = $doctrine->getManager();    
+            $entityManager->persist($category);
+            $entityManager->flush();
+        }
+        
+        $categories = $doctrine->getRepository(Category::class)->findAll();
 
-        #[Route('/admin/categories', name: 'app_categories')]
-public function categories(ManagerRegistry $doctrine, Request $request): Response
-{
-    $category = new Category();
-    $form = $this->createForm(CategoryFormType::class, $category);
-    $form->handleRequest($request);
-    if ($form->isSubmitted() && $form->isValid()) {
-        $category = $form->getData();    
-        $entityManager = $doctrine->getManager();    
-        $entityManager->persist($category);
-        $entityManager->flush();
+        return $this->render('admin/categories.html.twig', [
+            'form' => $form->createView(),
+            'categories' => $categories,
+        ]);
     }
-    
-    
-    // --- NUEVA LÍNEA PARA RECUPERAR LA LISTA ---
-    $categories = $doctrine->getRepository(Category::class)->findAll();
-
-    return $this->render('admin/categories.html.twig', [
-        'form' => $form->createView(),
-        'categories' => $categories, // Pasamos la lista a Twig
-    ]);
-}
-
-
-
-
-
 }

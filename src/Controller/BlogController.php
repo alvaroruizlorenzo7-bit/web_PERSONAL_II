@@ -26,7 +26,7 @@ public function post(ManagerRegistry $doctrine, $slug): Response
 }
 
 
- #[Route('/blog/new', name: 'new_post')]
+    #[Route('/blog/new', name: 'new_post')]
     public function newPost(ManagerRegistry $doctrine, Request $request, SluggerInterface $slugger): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
@@ -49,7 +49,6 @@ public function post(ManagerRegistry $doctrine, $slug): Response
                 } catch (FileException $e) {
                     // Manejar error
                 }
-                // ¡BORRA EL RETURN DE AQUÍ!
             }
 
             // 1. GENERAMOS EL SLUG (Esto es lo que faltaba para la ruta)
@@ -74,57 +73,23 @@ public function post(ManagerRegistry $doctrine, $slug): Response
         ]);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- #[Route('/testimonial', name: 'testimonial')]
+    #[Route('/testimonial', name: 'testimonial')]
     public function testimonial(): Response
     {
         return $this->render('blog/testimonial.html.twig');
     }
 
-
-
-
-
-  #[Route('/guide', name: 'guide')]
+    #[Route('/guide', name: 'guide')]
     public function guide(): Response
     {
         return $this->render('blog/guide.html.twig');
     }
 
-
-
-
-
-
-
-  #[Route('/destination', name: 'destination')]
-    public function estination(): Response
+    #[Route('/destination', name: 'destination')]
+    public function destination(): Response
     {
         return $this->render('blog/destination.html.twig');
     }
-
-
-
-
-
-
 
     #[Route('/blog', name: 'blog')]
     public function blog(): Response
@@ -135,8 +100,6 @@ public function post(ManagerRegistry $doctrine, $slug): Response
     #[Route('/single', name: 'single')]
     public function singlePost(): Response
     {
-        return $this->render('blog/single.html.twig', [
-           
-        ]);
+        return $this->render('blog/single.html.twig', []);
     }
 }

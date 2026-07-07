@@ -17,7 +17,6 @@ class CategoryFormType extends AbstractType
             ->add('Send', SubmitType::class, [
             'attr' => ['class' => 'btn btn-primary']
         ]);
-        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

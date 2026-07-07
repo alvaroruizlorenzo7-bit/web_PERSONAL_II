@@ -1,46 +1,58 @@
 {% extends 'base.html.twig' %}
 
-{% block body %}
-<div id="images">
-    <div class="container">
-        <div class="col-xs-12 col-sm-8 col-sm-push-2">
-            <h1>Images</h1>
-            {{ form(form) }}
-            <hr class="divider">
+{% block title %}Images Gallery Administration{% endblock %}
 
-            {# --- TABLA DEL RETO --- #}
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>File</th>
-                        <th>Views</th>
-                        <th>Likes</th>
-                        <th>Downloads</th>
-                        <th>Category</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for img in images %}
-                        <tr>
-                            <td>{{ img.id }}</td>
-                            <td>
-                                {# Usamos la ruta del reto para mostrar la miniatura #}
-                                <img src="{{ asset('uploads/images/' ~ img.file) }}" 
-                                     alt="image" style="width: 100px;">
-                            </td>
-                            <td>{{ img.numViews }}</td>
-                            <td>{{ img.numLikes }}</td>
-                            <td>{{ img.numDownloads }}</td>
-                            <td>{{ img.category ? img.category.name : 'Sin categoría' }}</td>
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="6">No images found.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+{% block body %}
+<div id="images" class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10">
+                <div class="card shadow border-0 rounded-lg p-4 bg-white mb-5">
+                    <h1 class="mb-4 text-primary font-weight-bold text-center">Admin Gallery Images</h1>
+                    {{ form(form) }}
+                </div>
+
+                <div class="card shadow border-0 rounded-lg p-4 bg-white">
+                    <h3 class="mb-4 text-dark font-weight-bold">Uploaded Images</h3>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Image</th>
+                                    <th>Views</th>
+                                    <th>Likes</th>
+                                    <th>Downloads</th>
+                                    <th>Category</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for img in images %}
+                                    <tr>
+                                        <td>{{ img.id }}</td>
+                                        <td>
+                                            <img src="{{ asset('uploads/images/' ~ img.file) }}" 
+                                                 alt="image" class="img-thumbnail" style="max-width: 100px;">
+                                        </td>
+                                        <td><span class="badge badge-info">{{ img.numViews }}</span></td>
+                                        <td><span class="badge badge-success">❤️ {{ img.numLikes }}</span></td>
+                                        <td><span class="badge badge-secondary">{{ img.numDownloads }}</span></td>
+                                        <td>
+                                            <span class="badge badge-primary">
+                                                {{ img.category ? img.category.name : 'Sin categoría' }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">No images found.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

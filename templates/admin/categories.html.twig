@@ -3,37 +3,42 @@
 {% block title %}Categories{% endblock %}
 
 {% block body %}
-<div id="categories">
+<div id="categories" class="py-5">
     <div class="container">
-        <div class="col-xs-12 col-sm-8 col-sm-push-2">
-            <h1>Categories</h1>
-            
-            {{ form(form, {'attr': {'class': 'form-horizontal'}}) }}
-            
-            <hr class='divider'>
-            {# --- TABLA PARA MOSTRAR LA LISTA --- #}
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for cat in categories %}
-                        <tr>
-                            <td>{{ cat.id }}</td>
-                            <td>{{ cat.name }}</td>
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="2">No hay categorías registradas.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10">
+                <div class="card shadow border-0 rounded-lg p-4 bg-white mb-5">
+                    <h1 class="mb-4 text-primary font-weight-bold text-center">Categories</h1>
+                    {{ form(form) }}
+                </div>
+                
+                <div class="card shadow border-0 rounded-lg p-4 bg-white">
+                    <h3 class="mb-4 text-dark font-weight-bold">Registered Categories</h3>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cat in categories %}
+                                    <tr>
+                                        <td>{{ cat.id }}</td>
+                                        <td>{{ cat.name }}</td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="2" class="text-center text-muted">No hay categorías registradas.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-        
 {% endblock %}

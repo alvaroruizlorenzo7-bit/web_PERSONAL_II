@@ -20,28 +20,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    
     #[ORM\Column(length: 255)]
-private $name;
+    private $name;
 
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
 
-public function getName(): ?string
-{
-    return $this->name;
-}
+    public function setName(string $name): self
+    {
+        $this->name = $name;
 
-public function setName(string $name): self
-{
-    $this->name = $name;
+        return $this;
+    }
 
-    return $this;
-}
-
-
-#[ORM\Column(length: 180)]
-
-
-
+    #[ORM\Column(length: 180)]
     private ?string $email = null;
 
     /**

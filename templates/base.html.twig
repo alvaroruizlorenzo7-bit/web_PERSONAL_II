@@ -57,12 +57,20 @@
                         </div>
                         <a href="{{ path('contact') }}" class="nav-item nav-link">Contact</a>
                     </div>
-                    {% if app.user %}
-	<li><a href="{{ path('app_logout') }}"><i class="fa fa-sign-out sr-icons"></i> {{ app.user.email }} - Logout</a></li>
-{% else %}
-	<li class="{{ (app.request.attributes.get('_route') == 'app_login')  ? 'active': ''}} lien"><a href="{{ path('app_login') }}"><i class="fa fa-sign-in sr-icons"></i> Login</a></li>	
-	<li class="{{ (app.request.attributes.get('_route') == 'app_register')  ? 'active': ''}} "><a href="{{ path('app_register') }}"><i class="fa fa-user-secret sr-icons"></i> Register</a></li>
-{% endif %}
+                    <div class="navbar-nav py-0">
+                        {% if app.user %}
+                            <a href="{{ path('app_logout') }}" class="nav-item nav-link">
+                                <i class="fa fa-sign-out-alt"></i> {{ app.user.email }} - Logout
+                            </a>
+                        {% else %}
+                            <a href="{{ path('app_login') }}" class="nav-item nav-link {{ (app.request.attributes.get('_route') == 'app_login') ? 'active' : '' }}">
+                                <i class="fa fa-sign-in-alt"></i> Login
+                            </a>
+                            <a href="{{ path('app_register') }}" class="nav-item nav-link {{ (app.request.attributes.get('_route') == 'app_register') ? 'active' : '' }}">
+                                <i class="fa fa-user-plus"></i> Register
+                            </a>
+                        {% endif %}
+                    </div>
                 </div>
             </nav>
         </div>
@@ -150,18 +158,18 @@
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
-    <script src="lib/easing/easing.min.js"></script>
-    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
-    <script src="lib/tempusdominus/js/moment.min.js"></script>
-    <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
-    <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script src="{{ asset('lib/easing/easing.min.js') }}"></script>
+    <script src="{{ asset('lib/owlcarousel/owl.carousel.min.js') }}"></script>
+    <script src="{{ asset('lib/tempusdominus/js/moment.min.js') }}"></script>
+    <script src="{{ asset('lib/tempusdominus/js/moment-timezone.min.js') }}"></script>
+    <script src="{{ asset('lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js') }}"></script>
 
     <!-- Contact Javascript File -->
-    <script src="mail/jqBootstrapValidation.min.js"></script>
-    <script src="mail/contact.js"></script>
+    <script src="{{ asset('mail/jqBootstrapValidation.min.js') }}"></script>
+    <script src="{{ asset('mail/contact.js') }}"></script>
 
     <!-- Template Javascript -->
-    <script src="js/main.js"></script>
+    <script src="{{ asset('js/main.js') }}"></script>
 </body>
 
 </html>
